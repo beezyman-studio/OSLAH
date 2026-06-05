@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/agent_provider.dart';
 import '../widgets/chat_interface.dart';
-import '../widgets/network_settings_panel.dart';
+import '../widgets/server_control_panel_bridge.dart';
 import '../widgets/agent_builder_panel.dart';
 import '../widgets/system_metrics_panel.dart';
 import '../widgets/access_logs_panel.dart';
@@ -39,7 +39,7 @@ class DashboardScreen extends StatelessWidget {
                   case 'settings':
                     return const SettingsWorkspace();
                   case 'server':
-                    return const NetworkSettingsPanel();
+                    return const ServerControlPanelBridge();
                   case 'chat':
                   default:
                     return const ChatInterface();
