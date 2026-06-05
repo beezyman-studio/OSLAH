@@ -90,6 +90,4 @@ OSLAH is designed with local enterprise security compliance in mind:
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-### 📊 Business & Strategy Pitch:
-* Download **`OSLAH_Strategy_Presentation.pdf`** below to explore our enterprise architecture, market viability, and Open-Core roadmap!
+Team BeezMan Studio Kerala
