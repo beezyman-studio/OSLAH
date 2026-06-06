@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:uuid/uuid.dart';
+import '../core/rag/document_processor.dart';
 import '../services/ollama_service.dart';
 import '../services/queue_manager.dart';
 import '../services/database_service.dart';
@@ -271,6 +272,18 @@ class AgentProvider extends ChangeNotifier {
           
           // Phase 2: Slice document into chunks and index inside SQLite
           await _ragIndexer.indexFile(platformFile.name, textContent);
+
+          // Phase 3: Also index using memory DocumentProcessor if .txt or .md and path is not null
+          if (platformFile.path != null) {
+            final ext = platformFile.name.split('.').last.toLowerCase();
+            if (ext == 'txt' || ext == 'md') {
+              try {
+                await DocumentProcessor().processFile(platformFile.path!);
+              } catch (e) {
+                debugPrint('DocumentProcessor index file error: $e');
+              }
+            }
+          }
         }
         notifyListeners();
       }
@@ -329,18 +342,15 @@ class AgentProvider extends ChangeNotifier {
     notifyListeners();
 
     // 3. Prepare payload with Injected Knowledge context
-    String fullUserPrompt = '';
+    final String fullUserPrompt = text;
     
-    // Phase 2: Retrieve relevant matching chunks instead of dumping entire file content
-    final chunks = await _ragIndexer.retrieveRelevantChunks(text, limit: 3);
-    if (chunks.isNotEmpty) {
-      fullUserPrompt += 'System Context Injected from Local Knowledge Base Documents:\n';
-      for (var chunk in chunks) {
-        fullUserPrompt += '--- MATCHED CHUNK ---\n$chunk\n';
-      }
-      fullUserPrompt += 'Using the context matched chunks above, please answer this prompt:\n';
-    }
-    fullUserPrompt += text;
+    // Retrieve relevant matching chunks from SQLite RAG indexer and memory DocumentProcessor
+    final dbChunks = await _ragIndexer.retrieveRelevantChunks(text, limit: 3);
+    final memChunks = DocumentProcessor()
+        .retrieveSimilarChunks(text, limit: 3)
+        .map((c) => c.textContent)
+        .toList();
+    final allContextChunks = {...dbChunks, ...memChunks}.toList();
 
     final List<Map<String, String>> payload = [];
 
@@ -374,6 +384,7 @@ class AgentProvider extends ChangeNotifier {
       baseUrl: _ollamaUrl,
       model: _selectedModel ?? 'deepseek-r1:7b',
       messages: payload,
+      documentContext: allContextChunks,
     );
 
     // 5. Pipe streaming response to the UI state

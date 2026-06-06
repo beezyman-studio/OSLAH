@@ -7,6 +7,7 @@ class QueueTask {
   final String baseUrl;
   final String model;
   final List<Map<String, String>> messages;
+  final List<String>? documentContext;
   final StreamController<String> controller = StreamController<String>.broadcast();
   final DateTime queuedAt;
 
@@ -15,6 +16,7 @@ class QueueTask {
     required this.baseUrl,
     required this.model,
     required this.messages,
+    this.documentContext,
   }) : queuedAt = DateTime.now();
 }
 
@@ -56,12 +58,14 @@ class QueueManager {
     required String baseUrl,
     required String model,
     required List<Map<String, String>> messages,
+    List<String>? documentContext,
   }) {
     final task = QueueTask(
       id: id,
       baseUrl: baseUrl,
       model: model,
       messages: messages,
+      documentContext: documentContext,
     );
 
     _queue.add(task);
@@ -113,10 +117,28 @@ class QueueManager {
     _notifyStatus();
 
     try {
+      List<Map<String, String>> finalMessages = task.messages;
+      if (task.documentContext != null && task.documentContext!.isNotEmpty) {
+        finalMessages = List.from(task.messages);
+        final contextStr = 'System Context Injected from Local Knowledge Base Documents:\n'
+            '${task.documentContext!.map((c) => '--- MATCHED CHUNK ---\n$c').join('\n')}\n'
+            'Using the context matched chunks above, please answer the user prompt.';
+        
+        int systemIndex = finalMessages.indexWhere((m) => m['role'] == 'system');
+        if (systemIndex != -1) {
+          finalMessages[systemIndex] = {
+            'role': 'system',
+            'content': '${finalMessages[systemIndex]['content']}\n\n$contextStr',
+          };
+        } else {
+          finalMessages.insert(0, {'role': 'system', 'content': contextStr});
+        }
+      }
+
       final chatStream = _ollamaService.streamChat(
         baseUrl: task.baseUrl,
         model: task.model,
-        messages: task.messages,
+        messages: finalMessages,
       );
 
       final completer = Completer<void>();
