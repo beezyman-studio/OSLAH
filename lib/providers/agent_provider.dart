@@ -12,6 +12,7 @@ import '../services/local_server_service.dart';
 import '../services/rag_indexer_service.dart';
 import '../services/agent_manager_service.dart';
 import '../services/model_downloader_service.dart';
+import '../premium/license_verifier.dart';
 
 class Message {
   final String id;
@@ -320,6 +321,27 @@ class AgentProvider extends ChangeNotifier {
   void sendMessage(String text) async {
     if (text.trim().isEmpty) return;
 
+    // Active clock tamper check during inference loop
+    await LicenseVerifier().checkClockTamper();
+    if (LicenseVerifier.currentState == LicenseState.tampered) {
+      final userMsg = Message(
+        id: _uuid.v4(),
+        sender: 'user',
+        text: text,
+        timestamp: DateTime.now(),
+      );
+      _messages.add(userMsg);
+      final errorMsg = Message(
+        id: _uuid.v4(),
+        sender: 'assistant',
+        text: '[CRITICAL SECURITY VIOLATION]: System clock tampering detected. Features are locked.',
+        timestamp: DateTime.now(),
+      );
+      _messages.add(errorMsg);
+      notifyListeners();
+      return;
+    }
+
     // 1. User Message
     final userMsg = Message(
       id: _uuid.v4(),
@@ -481,6 +503,9 @@ class AgentProvider extends ChangeNotifier {
   // --- Phase 2 Server Methods ---
 
   Future<void> _loadDatabaseSettings() async {
+    // Clock tamper protection check on boot
+    await LicenseVerifier().checkClockTamper();
+
     _isFirstLaunch = await _dbService.checkFirstLaunch();
     final settings = await _dbService.getNetworkSettings();
     _serverHost = settings['host'] ?? '0.0.0.0';

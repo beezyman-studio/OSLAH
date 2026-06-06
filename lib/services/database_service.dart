@@ -27,7 +27,7 @@ class DatabaseService {
 
     return await openDatabase(
       dbPath,
-      version: 2,
+      version: 3,
       onCreate: (db, version) async {
         // Create tables
         await db.execute('''
@@ -70,6 +70,13 @@ class DatabaseService {
           )
         ''');
 
+        await db.execute('''
+          CREATE TABLE app_metadata (
+            key TEXT PRIMARY KEY,
+            value TEXT
+          )
+        ''');
+
         // Insert initial default configuration settings
         await db.insert('network_settings', {
           'host': '0.0.0.0',
@@ -79,9 +86,21 @@ class DatabaseService {
         });
       },
       onUpgrade: (db, oldVersion, newVersion) async {
-        try {
-          await db.execute('ALTER TABLE network_settings ADD COLUMN first_launch INTEGER DEFAULT 1');
-        } catch (_) {}
+        if (oldVersion < 2) {
+          try {
+            await db.execute('ALTER TABLE network_settings ADD COLUMN first_launch INTEGER DEFAULT 1');
+          } catch (_) {}
+        }
+        if (oldVersion < 3) {
+          try {
+            await db.execute('''
+              CREATE TABLE app_metadata (
+                key TEXT PRIMARY KEY,
+                value TEXT
+              )
+            ''');
+          } catch (_) {}
+        }
       },
     );
   }
@@ -253,5 +272,37 @@ class DatabaseService {
     } catch (e) {
       debugPrint('Database error completing first launch: $e');
     }
+  }
+
+  // --- App Metadata KV CRUD ---
+  Future<void> setMetadataValue(String key, String value) async {
+    final db = await database;
+    try {
+      await db.insert(
+        'app_metadata',
+        {'key': key, 'value': value},
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    } catch (e) {
+      debugPrint('Database error updating metadata: $e');
+    }
+  }
+
+  Future<String?> getMetadataValue(String key) async {
+    final db = await database;
+    try {
+      final List<Map<String, dynamic>> maps = await db.query(
+        'app_metadata',
+        where: 'key = ?',
+        whereArgs: [key],
+        limit: 1,
+      );
+      if (maps.isNotEmpty) {
+        return maps.first['value'] as String?;
+      }
+    } catch (e) {
+      debugPrint('Database error reading metadata: $e');
+    }
+    return null;
   }
 }
