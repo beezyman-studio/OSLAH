@@ -305,4 +305,23 @@ class DatabaseService {
     }
     return null;
   }
+
+  /// Exposes the absolute path to the SQLite database file
+  Future<String> getDatabasePath() async {
+    final appDocDir = await getApplicationDocumentsDirectory();
+    return p.join(appDocDir.path, 'oslah.db');
+  }
+
+  /// Closes the active database connection
+  Future<void> closeDatabase() async {
+    if (_database != null) {
+      try {
+        await _database!.close();
+        _database = null;
+        debugPrint('SQLite active connection closed successfully.');
+      } catch (e) {
+        debugPrint('Database error closing connection: $e');
+      }
+    }
+  }
 }
