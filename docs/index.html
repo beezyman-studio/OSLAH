@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OSLAH — The Privacy-First Local AI Agent Hub</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Host and distribute offline AI agents across your office network. OSLAH enables zero-latency local intelligence with zero-cloud dependencies, enterprise RBAC, and cryptographically verified offline licensing.">
+  <meta name="keywords" content="Local AI, Offline LLM, Ollama Gateway, Enterprise AI, Air-Gapped AI, Privacy-First AI, OSLAH">
+  <meta name="author" content="Beezyman Studio">
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="OSLAH — The Privacy-First Local AI Agent Hub">
+  <meta property="og:description" content="Expose your host's local Ollama capabilities safely across the office network. 100% offline, secure, and private.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@800;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  
+  <style>
+    /* Design Tokens */
+    :root {
+      --bg-dark: #07080D;
+      --bg-panel: #0E101A;
+      --bg-card: #131626;
+      --border-color: #242A45;
+      --border-glow: rgba(0, 229, 255, 0.15);
+      
+      --accent-yellow: #FFCC00;
+      --accent-yellow-rgb: 255, 204, 0;
+      --accent-blue: #00E5FF;
+      --accent-blue-rgb: 0, 229, 255;
+      
+      --text-white: #F3F4F6;
+      --text-muted: #8E96A7;
+      
+      --color-green: #10B981;
+      --color-red: #EF4444;
+      --font-primary: 'Inter', sans-serif;
+      --font-header: 'Outfit', sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+    
+    /* Reset & Base Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-white);
+      font-family: var(--font-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-dark);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 5px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-blue);
+    }
+    
+    /* Layout Containers */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    
+    /* Header Navigation */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 100;
+      background: rgba(7, 8, 13, 0.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(36, 42, 69, 0.5);
+    }
+    
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 80px;
+    }
+    
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+    
+    .logo-box {
+      width: 36px;
+      height: 36px;
+      background: var(--bg-panel);
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.1);
+    }
+    
+    .logo-text {
+      font-family: var(--font-header);
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      color: var(--text-white);
+    }
+    
+    .logo-text span {
+      color: var(--accent-yellow);
+    }
+    
+    nav ul {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+    
+    nav a:hover, nav a.active {
+      color: var(--accent-blue);
+    }
+    
+    .nav-github-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background: rgba(36, 42, 69, 0.3);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-white);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .nav-github-btn:hover {
+      border-color: var(--accent-yellow);
+      background: rgba(255, 204, 0, 0.05);
+      box-shadow: 0 0 15px rgba(255, 204, 0, 0.1);
+    }
+    
+    /* Hero Section */
+    .hero-section {
+      padding: 180px 0 100px 0;
+      position: relative;
+    }
+    
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translate(-50%, -10%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(0, 229, 255, 0.05) 0%, rgba(0,0,0,0) 70%);
+      pointer-events: none;
+      z-index: -1;
+    }
+    
+    .hero-content {
+      text-align: center;
+      max-width: 850px;
+      margin: 0 auto;
+    }
+    
+    .enterprise-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: rgba(255, 204, 0, 0.1);
+      border: 1px solid rgba(255, 204, 0, 0.25);
+      border-radius: 30px;
+      color: var(--accent-yellow);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 24px;
+      box-shadow: 0 0 15px rgba(255, 204, 0, 0.05);
+    }
+    
+    .hero-title {
+      font-family: var(--font-header);
+      font-size: 56px;
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -1.5px;
+      margin-bottom: 24px;
+      color: var(--text-white);
+    }
+    
+    .hero-title span {
+      background: linear-gradient(90deg, var(--accent-yellow) 0%, var(--accent-blue) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .hero-subtitle {
+      font-size: 18px;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 40px auto;
+    }
+    
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 64px;
+    }
+    
+    .btn {
+      padding: 16px 28px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-yellow) 0%, #D97706 100%);
+      color: #07080D;
+      box-shadow: 0 8px 25px rgba(255, 204, 0, 0.25);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(255, 204, 0, 0.4);
+    }
+    
+    .btn-secondary {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      color: var(--text-white);
+    }
+    
+    .btn-secondary:hover {
+      border-color: var(--accent-blue);
+      background: rgba(0, 229, 255, 0.05);
+      color: var(--accent-blue);
+      transform: translateY(-2px);
+    }
+    
+    /* Mock App Dashboard Preview */
+    .dashboard-preview {
+      width: 100%;
+      aspect-ratio: 16/10;
+      background: var(--bg-panel);
+      border: 1.5px solid var(--border-color);
+      border-radius: 20px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 40px rgba(0, 229, 255, 0.05);
+      overflow: hidden;
+      display: flex;
+      border-top-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .preview-sidebar {
+      width: 200px;
+      background: #090B12;
+      border-right: 1px solid var(--border-color);
+      padding: 20px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    
+    .preview-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    
+    .preview-logo-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-yellow);
+      border-radius: 50%;
+    }
+    
+    .preview-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .preview-nav-item {
+      height: 32px;
+      border-radius: 6px;
+      background: rgba(36, 42, 69, 0.15);
+      width: 100%;
+    }
+    .preview-nav-item.active {
+      background: rgba(0, 229, 255, 0.1);
+      border: 1px solid rgba(0, 229, 255, 0.2);
+    }
+    
+    .preview-nav-item:nth-child(2) { width: 85%; }
+    .preview-nav-item:nth-child(3) { width: 90%; }
+    .preview-nav-item:nth-child(4) { width: 75%; }
+    
+    .preview-main {
+      flex: 1;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .preview-title-bar {
+      width: 180px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+    }
+    
+    .preview-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--color-green);
+    }
+    
+    .preview-status-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--color-green);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+    
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    
+    .preview-card {
+      background: rgba(36, 42, 69, 0.2);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      height: 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    
+    .preview-card-title {
+      width: 60px;
+      height: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 3px;
+    }
+    .preview-card-val {
+      width: 100px;
+      height: 20px;
+      background: rgba(0, 229, 255, 0.1);
+      border-radius: 4px;
+    }
+    
+    .preview-chat {
+      flex: 1;
+      background: rgba(36, 42, 69, 0.1);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+    
+    .preview-bubble {
+      max-width: 60%;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+    }
+    .preview-bubble.user {
+      align-self: flex-end;
+      background: rgba(255, 204, 0, 0.1);
+      border: 1px solid rgba(255, 204, 0, 0.2);
+      width: 180px;
+      height: 32px;
+    }
+    .preview-bubble.bot {
+      align-self: flex-start;
+      background: rgba(0, 229, 255, 0.05);
+      border: 1px solid rgba(0, 229, 255, 0.1);
+      width: 240px;
+      height: 48px;
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 0.3; }
+      50% { opacity: 1; }
+      100% { opacity: 0.3; }
+    }
+    
+    /* Grid Feature Matrix Section */
+    .section-title {
+      font-family: var(--font-header);
+      font-size: 38px;
+      font-weight: 900;
+      text-align: center;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+    
+    .section-subtitle {
+      font-size: 15px;
+      color: var(--text-muted);
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 48px auto;
+    }
+    
+    .matrix-section {
+      padding: 100px 0;
+      border-top: 1px solid rgba(36, 42, 69, 0.5);
+    }
+    
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+    
+    .matrix-col {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .matrix-header-box {
+      padding: 16px;
+      border-radius: 12px;
+      font-family: var(--font-header);
+      font-size: 20px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid var(--border-color);
+    }
+    
+    .matrix-header-box.free {
+      background: rgba(36, 42, 69, 0.15);
+      border-left: 4px solid var(--accent-blue);
+      color: var(--accent-blue);
+    }
+    
+    .matrix-header-box.premium {
+      background: rgba(255, 204, 0, 0.03);
+      border-left: 4px solid var(--accent-yellow);
+      color: var(--accent-yellow);
+      box-shadow: 0 0 20px rgba(255, 204, 0, 0.02);
+    }
+    
+    .matrix-card {
+      background: var(--bg-panel);
+      border: 1.5px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+      transition: all 0.3s;
+      overflow: hidden;
+    }
+    
+    .matrix-card:hover {
+      border-color: rgba(0, 229, 255, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 229, 255, 0.05);
+    }
+    
+    .matrix-col.premium-col .matrix-card:hover {
+      border-color: rgba(255, 204, 0, 0.4);
+      box-shadow: 0 8px 30px rgba(255, 204, 0, 0.05);
+    }
+    
+    .card-icon-area {
+      width: 44px;
+      height: 44px;
+      background: rgba(36, 42, 69, 0.3);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      color: var(--accent-blue);
+    }
+    
+    .matrix-col.premium-col .card-icon-area {
+      color: var(--accent-yellow);
+      background: rgba(255, 204, 0, 0.05);
+    }
+    
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-white);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .card-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      height: 40px;
+    }
+    
+    .lock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: rgba(255, 204, 0, 0.1);
+      border: 1.5px solid rgba(255, 204, 0, 0.2);
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--accent-yellow);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Interactive LAN Sandbox Section */
+    .sandbox-section {
+      padding: 100px 0;
+      background: rgba(14, 16, 26, 0.3);
+      border-top: 1px solid rgba(36, 42, 69, 0.5);
+      border-bottom: 1px solid rgba(36, 42, 69, 0.5);
+    }
+    
+    .sandbox-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+    
+    .sandbox-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    
+    .scenario-btn {
+      background: var(--bg-panel);
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      transition: all 0.3s;
+    }
+    
+    .scenario-btn:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      background: rgba(36, 42, 69, 0.2);
+    }
+    
+    .scenario-btn.active {
+      border-color: var(--accent-yellow);
+      background: rgba(255, 204, 0, 0.03);
+      box-shadow: 0 0 20px rgba(255, 204, 0, 0.05);
+    }
+    
+    .scenario-btn.active .scenario-number {
+      background: var(--accent-yellow);
+      color: #07080D;
+      border-color: var(--accent-yellow);
+    }
+    
+    .scenario-number {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      transition: all 0.3s;
+    }
+    
+    .scenario-info {
+      flex: 1;
+    }
+    
+    .scenario-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-white);
+      margin-bottom: 4px;
+    }
+    
+    .scenario-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    
+    /* Interactive Network Visualization Canvas */
+    .sandbox-visualizer {
+      background: var(--bg-panel);
+      border: 1.5px solid var(--border-color);
+      border-radius: 20px;
+      padding: 24px;
+      height: 480px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+    
+    .visualizer-canvas {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* SVG Network Diagram Overlay */
+    .network-svg {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    
+    .node {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      z-index: 2;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      transition: all 0.5s;
+    }
+    
+    .node.active-pulse {
+      box-shadow: 0 0 25px var(--accent-blue);
+      border-color: var(--accent-blue);
+    }
+    .node.admin-pulse {
+      box-shadow: 0 0 25px var(--accent-yellow);
+      border-color: var(--accent-yellow);
+    }
+    .node.error-pulse {
+      box-shadow: 0 0 25px var(--color-red);
+      border-color: var(--color-red);
+    }
+    
+    .node span {
+      font-size: 8px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Nodes Coordinates */
+    #node-admin { top: 20%; left: 10%; }
+    #node-employee { top: 50%; left: 10%; }
+    #node-guest { top: 80%; left: 10%; }
+    
+    #node-server { 
+      top: 50%; 
+      left: 70%; 
+      transform: translateY(-50%);
+      width: 90px;
+      height: 90px;
+      border-radius: 20px;
+      background: #0B0D16;
+      border: 2px solid var(--border-color);
+      box-shadow: 0 0 30px rgba(0,0,0,0.7);
+    }
+    
+    #node-server.server-on {
+      border-color: var(--color-green);
+      box-shadow: 0 0 35px rgba(16, 185, 129, 0.2);
+    }
+    #node-server.server-off {
+      border-color: var(--color-red);
+      box-shadow: 0 0 35px rgba(239, 68, 68, 0.2);
+    }
+    
+    #node-server span {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--text-white);
+    }
+    
+    /* Animated Packet */
+    .network-packet {
+      width: 10px;
+      height: 10px;
+      background: var(--accent-blue);
+      border-radius: 50%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      offset-path: path("M 10 10 L 100 100"); /* overridden dynamically */
+      offset-rotate: auto;
+      z-index: 3;
+      display: none;
+      box-shadow: 0 0 10px var(--accent-blue);
+    }
+    
+    /* Terminal Console logs */
+    .sandbox-console {
+      height: 110px;
+      background: #040508;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      overflow-y: auto;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    
+    .console-line {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .console-time {
+      color: var(--accent-blue);
+    }
+    .console-text.success { color: var(--color-green); }
+    .console-text.error { color: var(--color-red); }
+    .console-text.warning { color: var(--accent-yellow); }
+    
+    /* Quick Start Setup */
+    .setup-section {
+      padding: 100px 0;
+    }
+    
+    .setup-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+    }
+    
+    .setup-step {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    
+    .step-number {
+      width: 36px;
+      height: 36px;
+      background: rgba(0, 229, 255, 0.05);
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-blue);
+      font-family: var(--font-header);
+      font-weight: 800;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    
+    .step-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-white);
+      margin-bottom: 6px;
+    }
+    
+    .step-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    
+    .code-container {
+      background: #090A0F;
+      border: 1.5px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      overflow-x: auto;
+      position: relative;
+    }
+    
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      font-size: 11px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 8px;
+    }
+    
+    .code-lang-label {
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    
+    .copy-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+    .copy-btn:hover {
+      color: var(--accent-blue);
+    }
+    
+    .code-body {
+      color: #A5B4FC;
+    }
+    
+    .code-body span.keyword { color: #F472B6; }
+    .code-body span.string { color: #34D399; }
+    .code-body span.comment { color: #6B7280; }
+    
+    /* Footer */
+    footer {
+      background: #040508;
+      border-top: 1px solid var(--border-color);
+      padding: 60px 0;
+      text-align: center;
+    }
+    
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .footer-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      max-width: 450px;
+      margin: 0 auto 30px auto;
+    }
+    
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      list-style: none;
+      margin-bottom: 30px;
+    }
+    
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      transition: color 0.3s;
+    }
+    
+    .footer-links a:hover {
+      color: var(--accent-yellow);
+    }
+    
+    .copyright {
+      font-size: 12px;
+      color: #4B5563;
+    }
+    
+    /* Responsive Queries */
+    @media (max-width: 992px) {
+      .hero-title {
+        font-size: 44px;
+      }
+      .matrix-grid, .sandbox-grid, .setup-layout {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .sandbox-visualizer {
+        height: 440px;
+      }
+    }
+    
+    @media (max-width: 600px) {
+      nav {
+        display: none;
+      }
+      .hero-title {
+        font-size: 32px;
+      }
+      .hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .btn {
+        justify-content: center;
+      }
+      #node-server {
+        width: 70px;
+        height: 70px;
+        border-radius: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Header -->
+  <header>
+    <div class="container nav-container">
+      <div class="logo-area" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+        <div class="logo-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-blue);"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        </div>
+        <div class="logo-text">OSLAH<span>.</span></div>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#lan-demo">LAN Sandbox</a></li>
+          <li><a href="#setup">Setup</a></li>
+        </ul>
+      </nav>
+      <a href="https://github.com/beezyman-studio/OSLAH" class="nav-github-btn" target="_blank">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+        GitHub Project
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container hero-content">
+      <div class="enterprise-badge">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--accent-yellow); margin-right: 4px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        Enterprise Grade Offline
+      </div>
+      <h1 class="hero-title">OSLAH — The Privacy-First<br><span>Local AI Agent Hub</span></h1>
+      <p class="hero-subtitle">
+        Deploy a secure, high-performance local AI gateway inside your office. Share local Ollama models across your LAN with advanced queue routing, sqlite logs, role-based access, and cryptographic offline security.
+      </p>
+      
+      <div class="hero-actions">
+        <a href="https://github.com/beezyman-studio/OSLAH/releases/latest/download/OSLAH_Setup.exe" class="btn btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Download Installer (.exe)
+        </a>
+        <a href="./OSLAH_Strategy_Presentation.pdf" class="btn btn-secondary" target="_blank">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="6 2 18 2 18 6 6 6 6 2"></polygon><rect x="3" y="6" width="18" height="16" rx="2"></rect><line x1="10" y1="12" x2="14" y2="12"></line><line x1="10" y1="16" x2="14" y2="16"></line></svg>
+          View Enterprise Pitch
+        </a>
+      </div>
+      
+      <!-- Styled CSS Mock Dashboard -->
+      <div class="dashboard-preview">
+        <div class="preview-sidebar">
+          <div class="preview-logo">
+            <div class="preview-logo-dot"></div>
+            OSLAH Core
+          </div>
+          <div class="preview-nav">
+            <div class="preview-nav-item active"></div>
+            <div class="preview-nav-item"></div>
+            <div class="preview-nav-item"></div>
+            <div class="preview-nav-item"></div>
+          </div>
+        </div>
+        <div class="preview-main">
+          <div class="preview-header">
+            <div class="preview-title-bar"></div>
+            <div class="preview-status">
+              <div class="preview-status-dot"></div>
+              LAN GATEWAY ACTIVE
+            </div>
+          </div>
+          <div class="preview-grid">
+            <div class="preview-card">
+              <div class="preview-card-title"></div>
+              <div class="preview-card-val"></div>
+            </div>
+            <div class="preview-card">
+              <div class="preview-card-title"></div>
+              <div class="preview-card-val"></div>
+            </div>
+            <div class="preview-card">
+              <div class="preview-card-title"></div>
+              <div class="preview-card-val"></div>
+            </div>
+          </div>
+          <div class="preview-chat">
+            <div class="preview-bubble user"></div>
+            <div class="preview-bubble bot"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Open-Core Feature Matrix Section -->
+  <section class="matrix-section" id="features">
+    <div class="container">
+      <h2 class="section-title">Open-Core Feature Matrix</h2>
+      <p class="section-subtitle">OSLAH is built on a high-efficiency open-source framework, expandable with powerful offline commercial enterprise capabilities.</p>
+      
+      <div class="matrix-grid">
+        
+        <!-- Free Core Column -->
+        <div class="matrix-col">
+          <div class="matrix-header-box free">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 16 12 12 8 16"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path><polyline points="16 16 12 12 8 16"></polyline></svg>
+            Free Open-Core
+          </div>
+          
+          <!-- Card 1 -->
+          <div class="matrix-card">
+            <div class="card-icon-area">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+            </div>
+            <h3 class="card-title">Offline Ollama Gateway</h3>
+            <p class="card-desc">Direct interface to locally running inference engines. Download and manage models like DeepSeek and Llama.</p>
+          </div>
+          
+          <!-- Card 2 -->
+          <div class="matrix-card">
+            <div class="card-icon-area">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>
+            </div>
+            <h3 class="card-title">SQLite Prompt History</h3>
+            <p class="card-desc">All chat histories, session models, and settings are stored locally. Zero cloud data leaks.</p>
+          </div>
+          
+          <!-- Card 3 -->
+          <div class="matrix-card">
+            <div class="card-icon-area">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            </div>
+            <h3 class="card-title">Hardware Telemetry</h3>
+            <p class="card-desc">Real-time CPU and RAM allocation graphs monitoring host performance during inference cycles.</p>
+          </div>
+        </div>
+        
+        <!-- Enterprise Pro Column -->
+        <div class="matrix-col premium-col">
+          <div class="matrix-header-box premium">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            Enterprise Pro
+          </div>
+          
+          <!-- Card 1 -->
+          <div class="matrix-card">
+            <div class="card-icon-area">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </div>
+            <h3 class="card-title">
+              Multi-User LAN Sharing
+              <span class="lock-badge">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Pro
+              </span>
+            </h3>
+            <p class="card-desc">Exposes host machine models to the office Wi-Fi/LAN via custom HttpServer with request routing.</p>
+          </div>
+          
+          <!-- Card 2 -->
+          <div class="matrix-card">
+            <div class="card-icon-area">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <h3 class="card-title">
+              Role-Based RBAC Permissions
+              <span class="lock-badge">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Pro
+              </span>
+            </h3>
+            <p class="card-desc">Split Admin and Employee APIs. Limit configuration edits to Admin keys while employees query chat endpoints.</p>
+          </div>
+          
+          <!-- Card 3 -->
+          <div class="matrix-card">
+            <div class="card-icon-area">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            </div>
+            <h3 class="card-title">
+              100% Offline Cryptographic Licensing
+              <span class="lock-badge">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Pro
+              </span>
+            </h3>
+            <p class="card-desc">Air-gapped verification using salted FNV-1a signatures without making any external Web API queries.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive LAN Sandbox Section -->
+  <section class="sandbox-section" id="lan-demo">
+    <div class="container">
+      <h2 class="section-title">Interactive LAN Access Sandbox</h2>
+      <p class="section-subtitle">Click scenarios below to simulate how the OSLAH server processes LAN traffic, implements role permissions, and updates sqlite audit logs locally.</p>
+      
+      <div class="sandbox-grid">
+        <!-- Interactive Controls -->
+        <div class="sandbox-controls">
+          
+          <button class="scenario-btn active" onclick="runSimulation(1)" id="btn-scen-1">
+            <div class="scenario-number">1</div>
+            <div class="scenario-info">
+              <div class="scenario-title">Employee Chat Query</div>
+              <div class="scenario-desc">Employee sends a POST chat request. Server verifies EMPLOYEE_KEY and forwards to Ollama Queue.</div>
+            </div>
+          </button>
+          
+          <button class="scenario-btn" onclick="runSimulation(2)" id="btn-scen-2">
+            <div class="scenario-number">2</div>
+            <div class="scenario-info">
+              <div class="scenario-title">Admin Configuration Switch</div>
+              <div class="scenario-desc">Admin sends model switch payload. Server verifies ADMIN_KEY, modifies default model, and restarts bindings.</div>
+            </div>
+          </button>
+          
+          <button class="scenario-btn" onclick="runSimulation(3)" id="btn-scen-3">
+            <div class="scenario-number">3</div>
+            <div class="scenario-info">
+              <div class="scenario-title">Employee Blocked Path (Forbidden)</div>
+              <div class="scenario-desc">Employee attempts to shut down server. Server checks RBAC rules and blocks request with 403 Forbidden.</div>
+            </div>
+          </button>
+          
+          <button class="scenario-btn" onclick="runSimulation(4)" id="btn-scen-4">
+            <div class="scenario-number">4</div>
+            <div class="scenario-info">
+              <div class="scenario-title">Unauthorized Device Connection</div>
+              <div class="scenario-desc">An unknown local device queries the API without a valid key. Server rejects request with 401 Unauthorized.</div>
+            </div>
+          </button>
+          
+        </div>
+        
+        <!-- Interactive Visualization -->
+        <div class="sandbox-visualizer">
+          <div style="font-size: 11px; font-weight: 700; color: var(--text-white); display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid var(--border-color); padding-bottom: 10px;">
+            <span>LAN NODE GRAPH DIAGRAM</span>
+            <span style="color: var(--accent-yellow); font-family: var(--font-mono); font-size: 9px;" id="network-status">ONLINE (OLLAMA CONNECTED)</span>
+          </div>
+          
+          <!-- Diagram Window -->
+          <div class="visualizer-canvas">
+            <svg class="network-svg">
+              <!-- Connector Lines -->
+              <path id="path-admin" d="M 100 80 Q 200 80 400 160" fill="none" stroke="#242A45" stroke-width="2" />
+              <path id="path-employee" d="M 100 200 Q 200 200 400 200" fill="none" stroke="#242A45" stroke-width="2" />
+              <path id="path-guest" d="M 100 320 Q 200 320 400 240" fill="none" stroke="#242A45" stroke-width="2" />
+              
+              <!-- Glow Line paths for animation -->
+              <path id="glow-admin" d="M 100 80 Q 200 80 400 160" fill="none" stroke="transparent" stroke-width="2" />
+              <path id="glow-employee" d="M 100 200 Q 200 200 400 200" fill="none" stroke="transparent" stroke-width="2" />
+              <path id="glow-guest" d="M 100 320 Q 200 320 400 240" fill="none" stroke="transparent" stroke-width="2" />
+            </svg>
+            
+            <!-- Nodes -->
+            <div class="node" id="node-admin">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-yellow);"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+              <span>Admin</span>
+            </div>
+            
+            <div class="node" id="node-employee">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-blue);"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+              <span>Staff</span>
+            </div>
+            
+            <div class="node" id="node-guest">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--text-muted);"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+              <span>Guest</span>
+            </div>
+            
+            <div class="node server-on" id="node-server">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-green); margin-bottom: 4px;" id="server-icon"><rect x="2" y="2" width="20" height="20" rx="2" ry="2"></rect><line x1="2" y1="8" x2="22" y2="8"></line><line x1="2" y1="14" x2="22" y2="14"></line><line x1="6" y1="5" x2="6.01" y2="5"></line><line x1="6" y1="11" x2="6.01" y2="11"></line><line x1="6" y1="17" x2="6.01" y2="17"></line></svg>
+              <span>OSLAH HOST</span>
+            </div>
+            
+            <!-- Floating Packet -->
+            <div class="network-packet" id="packet"></div>
+          </div>
+          
+          <!-- Mock Terminal Console -->
+          <div class="sandbox-console" id="console">
+            <div class="console-line">
+              <span class="console-time">[11:30:00]</span>
+              <span class="console-text">OSLAH Host Server initialized. Bindings listening on http://0.0.0.0:8080</span>
+            </div>
+            <div class="console-line">
+              <span class="console-time">[11:30:02]</span>
+              <span class="console-text warning">Offline License Verification: Successful (Beezyman Studio Developer License)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Getting Started Section -->
+  <section class="setup-section" id="setup">
+    <div class="container">
+      <h2 class="section-title">Getting Started</h2>
+      <p class="section-subtitle">Set up OSLAH and connect your team in under 5 minutes.</p>
+      
+      <div class="setup-layout">
+        <!-- Steps List -->
+        <div>
+          <!-- Step 1 -->
+          <div class="setup-step">
+            <div class="step-number">1</div>
+            <div>
+              <h3 class="step-title">Install Ollama Locally</h3>
+              <p class="step-desc">Download and install Ollama on the host machine. Run your chosen models locally (e.g., <code>ollama run deepseek-r1:7b</code>).</p>
+            </div>
+          </div>
+          
+          <!-- Step 2 -->
+          <div class="setup-step">
+            <div class="step-number">2</div>
+            <div>
+              <h3 class="step-title">Run OSLAH Installer</h3>
+              <p class="step-desc">Download and execute <code>OSLAH_Setup.exe</code>. Launch the OSLAH desktop application from your Windows workspace.</p>
+            </div>
+          </div>
+          
+          <!-- Step 3 -->
+          <div class="setup-step">
+            <div class="step-number">3</div>
+            <div>
+              <h3 class="step-title">Configure and Share Server API</h3>
+              <p class="step-desc">Enter your administrative API keys, launch the local network server dashboard, and distribute your endpoint across the local subnet.</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Code snippet area -->
+        <div class="code-container">
+          <div class="code-header">
+            <span class="code-lang-label">Client Shell Prompt</span>
+            <button class="copy-btn" onclick="copyCode()">Copy Code</button>
+          </div>
+          <pre class="code-body" id="code-snippet">
+<span class="comment"># Expose the local network chat completion API</span>
+curl http://<span class="keyword">192.168.1.15</span>:8080/api/chat \
+  -H <span class="string">"Authorization: Bearer YOUR_EMPLOYEE_KEY"</span> \
+  -H <span class="string">"Content-Type: application/json"</span> \
+  -d '{
+    <span class="string">"model"</span>: <span class="string">"deepseek-r1:7b"</span>,
+    <span class="string">"messages"</span>: [
+      {<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"Prompt offline LLM"</span>}
+    ]
+  }'
+          </pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-logo">
+        <div class="logo-box" style="border-color: var(--accent-yellow);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-yellow);"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        </div>
+        <div class="logo-text" style="font-size: 24px;">OSLAH<span>.</span></div>
+      </div>
+      <p class="footer-desc">Designed and engineered offline by Beezyman Studio. Empowering developers and corporate teams with sovereign local AI agent grids.</p>
+      
+      <ul class="footer-links">
+        <li><a href="https://github.com/beezyman-studio/OSLAH" target="_blank">Repository</a></li>
+        <li><a href="https://github.com/beezyman-studio/OSLAH/blob/main/LICENSE" target="_blank">Commercial License</a></li>
+        <li><a href="https://github.com/beezyman-studio/OSLAH/releases" target="_blank">Releases</a></li>
+      </ul>
+      
+      <p class="copyright">&copy; 2026 Beezyman Studio. All rights reserved. Open-Core Enterprise licensing.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Console references
+    const consoleBox = document.getElementById('console');
+    const packet = document.getElementById('packet');
+    const nodeServer = document.getElementById('node-server');
+    const serverIcon = document.getElementById('server-icon');
+    const networkStatus = document.getElementById('network-status');
+    
+    // Log utility helper
+    function appendConsoleLine(text, type = '') {
+      const now = new Date();
+      const timeStr = `[${now.toTimeString().substring(0, 8)}]`;
+      
+      const lineDiv = document.createElement('div');
+      lineDiv.className = 'console-line';
+      
+      const timeSpan = document.createElement('span');
+      timeSpan.className = 'console-time';
+      timeSpan.textContent = timeStr;
+      
+      const textSpan = document.createElement('span');
+      textSpan.className = `console-text ${type}`;
+      textSpan.textContent = text;
+      
+      lineDiv.appendChild(timeSpan);
+      lineDiv.appendChild(textSpan);
+      
+      consoleBox.appendChild(lineDiv);
+      consoleBox.scrollTop = consoleBox.scrollHeight;
+    }
+    
+    // Animation execution
+    let isAnimating = false;
+    
+    function runSimulation(scenarioId) {
+      if (isAnimating) return;
+      isAnimating = true;
+      
+      // Update active button classes
+      for (let i = 1; i <= 4; i++) {
+        document.getElementById(`btn-scen-${i}`).classList.remove('active');
+      }
+      document.getElementById(`btn-scen-${scenarioId}`).classList.add('active');
+      
+      // Reset active nodes indicators
+      document.getElementById('node-admin').className = 'node';
+      document.getElementById('node-employee').className = 'node';
+      document.getElementById('node-guest').className = 'node';
+      
+      // Reset paths glows
+      document.getElementById('glow-admin').setAttribute('stroke', 'transparent');
+      document.getElementById('glow-employee').setAttribute('stroke', 'transparent');
+      document.getElementById('glow-guest').setAttribute('stroke', 'transparent');
+      
+      let sourceNode, pathId, color, descStart, descEnd, success = true, isRBACBlock = false;
+      
+      switch(scenarioId) {
+        case 1:
+          sourceNode = document.getElementById('node-employee');
+          pathId = 'glow-employee';
+          color = 'var(--accent-blue)';
+          descStart = 'Client 192.168.1.48 (Employee) -> POST /api/chat';
+          descEnd = 'OSLAH Server: Access Allowed (Verified Role: Employee). Forwarding to queue...';
+          break;
+        case 2:
+          sourceNode = document.getElementById('node-admin');
+          pathId = 'glow-admin';
+          color = 'var(--accent-yellow)';
+          descStart = 'Client 192.168.1.100 (Admin) -> POST /api/models/switch';
+          descEnd = 'OSLAH Server: Switch request validated (Verified Role: Admin). Switch to llama3:latest completed.';
+          break;
+        case 3:
+          sourceNode = document.getElementById('node-employee');
+          pathId = 'glow-employee';
+          color = 'var(--color-red)';
+          descStart = 'Client 192.168.1.48 (Employee) -> POST /api/server/toggle';
+          descEnd = 'OSLAH Server: 403 Forbidden. Employee key has insufficient permissions to modify host configuration.';
+          success = false;
+          isRBACBlock = true;
+          break;
+        case 4:
+          sourceNode = document.getElementById('node-guest');
+          pathId = 'glow-guest';
+          color = 'var(--color-red)';
+          descStart = 'Client 192.168.1.250 (Guest) -> GET /api/status';
+          descEnd = 'OSLAH Server: 401 Unauthorized. Access rejected due to missing or invalid authorization key.';
+          success = false;
+          break;
+      }
+      
+      // Highlight source node
+      sourceNode.classList.add(scenarioId === 2 ? 'admin-pulse' : success ? 'active-pulse' : 'error-pulse');
+      
+      // Log request initiation
+      appendConsoleLine(descStart);
+      
+      // Animate packet travelling to host
+      animatePacket(scenarioId, color, true, () => {
+        // Pulse server node
+        if (success) {
+          nodeServer.className = 'node server-on active-pulse';
+          serverIcon.style.color = 'var(--accent-blue)';
+          
+          if (scenarioId === 2) {
+            appendConsoleLine(descEnd, 'warning');
+          } else {
+            appendConsoleLine(descEnd, 'success');
+          }
+          
+          // Animate packet returning to client
+          animatePacket(scenarioId, color, false, () => {
+            nodeServer.className = 'node server-on';
+            serverIcon.style.color = 'var(--color-green)';
+            sourceNode.className = 'node';
+            isAnimating = false;
+          });
+        } else {
+          // Blocked scenario
+          nodeServer.className = 'node server-on error-pulse';
+          serverIcon.style.color = 'var(--color-red)';
+          
+          if (isRBACBlock) {
+            appendConsoleLine(descEnd, 'error');
+          } else {
+            appendConsoleLine(descEnd, 'error');
+          }
+          
+          setTimeout(() => {
+            nodeServer.className = 'node server-on';
+            serverIcon.style.color = 'var(--color-green)';
+            sourceNode.className = 'node';
+            isAnimating = false;
+          }, 1000);
+        }
+      });
+    }
+    
+    function animatePacket(scenarioId, color, goingToHost, callback) {
+      packet.style.display = 'block';
+      packet.style.backgroundColor = color;
+      packet.style.boxShadow = `0 0 10px ${color}`;
+      
+      // Define path points dynamically based on client and host positions
+      const visualizer = document.querySelector('.visualizer-canvas');
+      const rectVis = visualizer.getBoundingClientRect();
+      
+      let clientName;
+      if (scenarioId === 1 || scenarioId === 3) clientName = 'node-employee';
+      else if (scenarioId === 2) clientName = 'node-admin';
+      else clientName = 'node-guest';
+      
+      const elClient = document.getElementById(clientName);
+      const elServer = document.getElementById('node-server');
+      
+      const rectClient = elClient.getBoundingClientRect();
+      const rectServer = elServer.getBoundingClientRect();
+      
+      // Coordinates relative to parent container
+      const startX = rectClient.left - rectVis.left + rectClient.width / 2;
+      const startY = rectClient.top - rectVis.top + rectClient.height / 2;
+      
+      const endX = rectServer.left - rectVis.left + rectServer.width / 2;
+      const endY = rectServer.top - rectVis.top + rectServer.height / 2;
+      
+      // Build dynamic motion path using Web Animations API
+      const keyframes = goingToHost 
+        ? [
+            { left: `${startX}px`, top: `${startY}px`, opacity: 0 },
+            { left: `${startX}px`, top: `${startY}px`, opacity: 1, offset: 0.1 },
+            { left: `${endX}px`, top: `${endY}px`, opacity: 1, offset: 0.9 },
+            { left: `${endX}px`, top: `${endY}px`, opacity: 0 }
+          ]
+        : [
+            { left: `${endX}px`, top: `${endY}px`, opacity: 0 },
+            { left: `${endX}px`, top: `${endY}px`, opacity: 1, offset: 0.1 },
+            { left: `${startX}px`, top: `${startY}px`, opacity: 1, offset: 0.9 },
+            { left: `${startX}px`, top: `${startY}px`, opacity: 0 }
+          ];
+          
+      const anim = packet.animate(keyframes, {
+        duration: 900,
+        easing: 'cubic-bezier(0.25, 1, 0.5, 1)'
+      });
+      
+      anim.onfinish = () => {
+        packet.style.display = 'none';
+        callback();
+      };
+    }
+    
+    // Copy code helper
+    function copyCode() {
+      const codeText = document.getElementById('code-snippet').textContent;
+      navigator.clipboard.writeText(codeText.trim());
+      
+      const copyBtn = document.querySelector('.copy-btn');
+      copyBtn.textContent = 'Copied!';
+      setTimeout(() => {
+        copyBtn.textContent = 'Copy Code';
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
